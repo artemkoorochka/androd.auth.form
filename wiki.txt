@@ -1,0 +1,7 @@
+.
+..
+git clone https://github.com/artemkoorochka/androd.auth.form.git
+git add .
+git status
+git commit -m "My description to commit"
+git push origin master
