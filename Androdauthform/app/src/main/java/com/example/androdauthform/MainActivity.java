@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.HandlerThread;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -30,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private URL serviceLocation;
     private HttpURLConnection connection;
 
+    BufferedReader rd  = null;
+    StringBuilder sb = null;
+    String line = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,13 +47,29 @@ public class MainActivity extends AppCompatActivity {
         try {
             serviceLocation = new URL(location);
             connection = (HttpURLConnection)serviceLocation.openConnection();
-            connection.setRequestProperty("Accept-Charset", "UTF-8");
             connection.setRequestProperty("Content-Type", "text/xml; UTF-8");
             connection.setRequestProperty("SOAPAction", loginAction);
-            connection.setRequestProperty("User-Agent", "android");
             connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
+
+
+            OutputStream reqStream = connection.getOutputStream();
+
+            // try send Login request to service
+            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(Login0Request);
+            writer.flush();
+            writer.close();
+            
+            // try get data of strim
+            rd  = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            sb = new StringBuilder();
+
+            while ((line = rd.readLine()) != null)
+            {
+                sb.append(line + '\n');
+            }
+
+            System.out.println(sb.toString());
 
 
         }catch (MalformedURLException e){
@@ -63,4 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
 }
+
+
